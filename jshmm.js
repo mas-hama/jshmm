@@ -3,7 +3,7 @@
  *
  * a Hidden Malkov Model program by JavaScript
  *
- * @version 0.0.1-alpha
+ * @version 0.0.1
  * @author Masafumi Hamamoto
  *
  */
