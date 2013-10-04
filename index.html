@@ -1,0 +1,63 @@
+<html>
+<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+
+<script src="http://code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script> 
+<script src="jshmm.js" type="text/javascript"></script>
+<script type="text/javascript">
+var hmm; 
+$(function(){
+  hmm = new HMM();
+});
+</script>
+<body>
+<h2>JSHMM(very tiny HMM in JavaScript) DEMO</h2>
+
+<h3>set training data</h3>
+
+<form>
+<textarea id="training" cols="30" rows="5" style="font-size: 16pt;">
+I noun
+am verb
+a article
+programmer noun
+. mark
+EOS
+</textarea>
+<input id="set-training" name="set-training" type="button" value="set training data" onClick="alert('begin'); hmm.setTrainingData($('#training').val());alert('done');" />
+</td>
+
+<!--
+HMM doesn't need to learn!
+<hr>
+<input id="learn" name="learn" type="button" value="do learnings" onClick="alert('begin'); hmm.learning(); alert('learning done');" />
+<hr>
+-->
+
+<h3>test (estimate)</h3>
+
+<textarea id="input" cols="30" rows="10" style="font-size: 16pt;">
+I
+was
+a
+student
+.
+EOS
+</textarea>
+<input id="button" name="button" type="button" value="input" onClick="var result = hmm.predictLabels($('#input').val()); var input = $('#input').val().split(/\n+/); var resultStr = ''; for(var i = 0; i < result.length; i++){ resultStr += input[i] + '	' + result[i] + '<br>'; }; $('#pred-result').html('<h4>Estimated Result</h4>' + resultStr); " />
+<br>
+
+<div id="pred-result">
+</div>
+
+</form>
+
+<input id="showprob" type="button" value="show probability table" onClick="$('#prob-table').html(hmm.genProbTable());" />
+
+<input id="showViterbi" type="button" value="show viterbi table" onClick="$('#viterbi-table').html(hmm.genViterbiResultTable());" />
+
+<div id="prob-table"></div>
+
+<div id="viterbi-table"></div>
+
+</body>
+</html>
