@@ -3,13 +3,20 @@
  *
  * a Hidden Malkov Model program by JavaScript
  *
- * @version 0.0.1
+ * @version 0.1.0
  * @author Masafumi Hamamoto
  *
  */
 
 /////////////////////// constructor ///////////////////////////
 "use strict";
+
+// for Node.js application
+if (typeof exports !== "undefined") {
+  exports.createHMM = function(option) {
+    return new HMM(option);
+  }
+}
 
 function HMM(option)
 {
@@ -40,27 +47,35 @@ function HMM(option)
  * input string must be separated by \n and each line is assumed as an observation
  */
 HMM.prototype.predictLabels = function(input) {
-  var lines = input.split(/\n+/);
+  var lines = input.split(/\n/);
   var line;
   var i;
   var data;
   var seqStr = "";
-  var x = []; // observation
-  
+  var x = []; // observations of a sentence
+  var allX = []; 
+
   for(i = 0; i < lines.length; i++) {
     line = lines[i];
     line = line.replace(/^\s+/, "");
-    if(line == ""){
-       continue;
-    }else if(line == "EOS"){
-       break;
+    // 2014/02/09: 文区切りは空行に変更
+    if (line === "") {
+      if (0 < x.length) {
+        allX.push(x);
+        x = [];
+      }
+    } else {
+      x.push(line);
     }
-    x.push(line);
   }
+//  console.log("allx.length: " + allX.length);
 
-  var estimatedSeq = this.predict(x);
-  this.lastPredResult.xlength = x.length;
-  this.lastPredResult.estimated = estimatedSeq;
+  var estimatedSeq = [];
+  for (i = 0; i < allX.length; i++) {
+    estimatedSeq.push(this.predict(allX[i]));
+    this.lastPredResult.xlength = x.length;
+    this.lastPredResult.estimated = estimatedSeq;
+  }
 
   return estimatedSeq;
 }
@@ -171,7 +186,7 @@ HMM.prototype.viterbi = function(bosNode) {
  * parse a string of training data
  */
 HMM.prototype.setTrainingData = function(trainingStr) {
-  var lines = trainingStr.split(/\n+/);
+  var lines = trainingStr.split(/\n/);
   var line;
   var x, y, xy, yy;
   var lastY;
@@ -182,10 +197,7 @@ HMM.prototype.setTrainingData = function(trainingStr) {
   for(lineCount = 0; lineCount < lines.length; lineCount++){
     line = lines[lineCount].replace(/^\s+/, "").replace(/\s+$/, "");
     
-    if(line == ""){
-      // skip
-      
-    } else if (line == "EOS") {
+    if (line === "") { // 2014/02/09: 文区切りを空行に変更
       if (isBOS) continue;
 
       x = '__EOS__';
